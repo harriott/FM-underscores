@@ -14,6 +14,8 @@
 # Drop this file into the parent folder that you want to work on, open a Terminal there,
 # enter the name of this file, hit return, and watch the progress!
 
+# Caveat: this may silently fail to rename folders monitored by Dropbox.
+
 use strict;  use warnings;  use File::Basename;  use File::Copy 'move';  use File::Find;
 
 # First, create a time check:
