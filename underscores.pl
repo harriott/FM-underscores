@@ -56,6 +56,8 @@ sub allfods {
 	if (-f $_) {$ext = lc($ext)};
 	$fodbn =~ s/\s+-/-/g;   # - stripped out blanks before hyphens
 	$fodbn =~ s/-\s+/-/g;   # - stripped out blanks after hyphens
+	$fodbn =~ s/\s+_/_/g;   # - stripped out blanks before underscores
+	$fodbn =~ s/_\s+/_/g;   # - stripped out blanks after underscores
 	$fodbn =~ s/\s+$//g;   # - stripped off trailing blanks
 	$fodbn =~ s/\s+/_/g;   # - converted all inner blanks to underscores
 	$ext =~ s/\.\s+/\./g;  # - took out any weirdly present blanks
