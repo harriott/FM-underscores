@@ -13,6 +13,7 @@
 
 # Drop this file into the parent folder that you want to work on, open a Terminal there,
 # enter the name of this file, hit return, and watch the progress!
+# Alternatively, something like:  perl /mnt/BX200/Files/IT_stack/underscores/underscores.pl
 
 # Accent in filename, like `é` is handled correctly,
 # though the changes reported in a Windows console may look odd.
