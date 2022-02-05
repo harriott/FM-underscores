@@ -1,26 +1,40 @@
 #!/bin/bash
 # vim: set et tw=0:
 
-# Joseph Harriott  Tue 10 Mar 2020
+# Joseph Harriott  Sat 05 Feb 2022
 
 # grab all imagey files flattened out
 # -----------------------------------
-#  bash -x /mnt/SDSSDA240G/Dropbox/JH/IT_stack/onGitHub/underscores/imageyFlat.sh
+#  bash $onGH/underscores/imageyFlat.sh
 
-if [ -d "imageyFlat" ]; then rm -r imageyFlat; fi
-mkdir "imageyFlat"
+# set as preferred
+targetParentDir=/mnt/SD480GSSDPlus/Play0
 
-imageyfiles=$(find . -iregex '.*\.\(avi\|gif\|jpeg\|jpg\|mkv\|mov\|mp4\|ogv\|png\)$')
+jHM=$(date "+%j-%H%M%S")
+[[ -w $targetParentDir ]] || targetParentDir=$HOME
+targetDir="$targetParentDir/imageyFlat-$jHM"
+mkdir "$targetDir"
 
-if [ -f "imageyFlat-errors.log" ]; then rm imageyFlat-errors.log; fi
-echo "vim: tw=0:" > imageyFlat-errors.log
-echo "" >> imageyFlat-errors.log
+# comment out if necessary
+# imageyMovies='\|avi\|mkv\|mov\|mp4\|ogv'
+imageyStills='\|gif\|jpeg\|jpg\|png'
+
+allOrs=$imageyMovies$imageyStills
+regex=${allOrs:2}  # gets rid of first spurious \|
+
+imageyfiles=$(find . -iregex ".*\.\($regex\)$")
+
+errors="$targetParentDir/imageyFlat-$jHM-errors.log"
+[[ -f "$errors" ]] && rm $errors
+echo "vim: tw=0:" > $errors
+echo "" >> $errors
 
 for if0 in $imageyfiles; do
   if1=${if0/.\//}
   if2=${if1//\//--}
-  # echo $if2
-  # cp $if0 "imageyFlat/$if2"
-  cp $if0 "imageyFlat/$if2" 2>> imageyFlat-errors.log
+  # echo $if2  # for checking
+  cp $if0 "$targetDir/$if2" 2>> $errors
 done
+gvim $errors
+echo "- output's in $targetDir"
 
