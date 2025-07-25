@@ -1,40 +1,46 @@
 #!/bin/bash
-# vim: set et tw=0:
+# vim: set sw=2:
 
-# Joseph Harriott  Sat 05 Feb 2022
+# Joseph Harriott  Fri 25 Jul 2025
 
 # grab all imagey files flattened out
 # -----------------------------------
-#  bash $onGH/underscores/imageyFlat.sh
+#  bash $onGH/FM-underscores/imageyFlat.sh
 
-# set as preferred
-targetParentDir=/mnt/SD480GSSDPlus/Play0
+targetParentDir="$HOME/Play0"
+if [ $targetParentDir ]; then
+  jHM=$(date "+%y%m%d-%H%M%S")
+  targetDir="$targetParentDir/imageyFlat-$jHM"
+  mkdir "$targetDir"
 
-jHM=$(date "+%j-%H%M%S")
-[[ -w $targetParentDir ]] || targetParentDir=$HOME
-targetDir="$targetParentDir/imageyFlat-$jHM"
-mkdir "$targetDir"
+  # comment out if necessary
+  # imageyMovies='\|avi\|mkv\|mov\|mp4\|ogv'
+  imageyStills='\|gif\|jpeg\|jpg\|png\|svg'
 
-# comment out if necessary
-# imageyMovies='\|avi\|mkv\|mov\|mp4\|ogv'
-imageyStills='\|gif\|jpeg\|jpg\|png'
+  regexes=$imageyMovies$imageyStills
+  regex=${regexes:2}  # gets rid of first spurious \|
 
-allOrs=$imageyMovies$imageyStills
-regex=${allOrs:2}  # gets rid of first spurious \|
+  mapfile -t imageyfiles < <(find . -iregex ".*\.\($regex\)$")
+  # for if in "${imageyfiles[@]}"; do echo "$if"; done  # for checking
 
-imageyfiles=$(find . -iregex ".*\.\($regex\)$")
+  errors="$targetParentDir/imageyFlat-$jHM-errors.log"
+  [[ -f "$errors" ]] && rm $errors
+  echo "vim: tw=0:" > $errors
+  echo "" >> $errors
 
-errors="$targetParentDir/imageyFlat-$jHM-errors.log"
-[[ -f "$errors" ]] && rm $errors
-echo "vim: tw=0:" > $errors
-echo "" >> $errors
-
-for if0 in $imageyfiles; do
-  if1=${if0/.\//}
-  if2=${if1//\//--}
-  # echo $if2  # for checking
-  cp $if0 "$targetDir/$if2" 2>> $errors
-done
-gvim $errors
-echo "- output's in $targetDir"
+  i=0
+  for if in "${imageyfiles[@]}"; do
+    ((i+=1))
+    iff="$if"
+    iff=${iff/.\//}
+    iff=${iff//\//--}
+    iff=${iff// /_}
+    # echo "$iff"  # for checking
+    cp "$if" "$targetDir/$iff" 2>> $errors
+  done
+  # gvim $errors
+  echo "- $i output's in $targetDir"
+else
+  echo "no  $targetParentDir"
+fi
 
