@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Joseph Harriott - https://harriott.github.io/ - Wed 30 Jul 2025
+# Joseph Harriott - https://harriott.github.io/ - ven 08 août 2025
 
 # This script looks recursively at all files and directories in the current directory,
 # and prints out the list found, but with these changes:
@@ -24,6 +24,7 @@
 
 use strict;  use warnings;  use File::Basename;  use File::Copy 'move';
 use File::Find; # finddepth()
+use utf8; # required for handling accented characters from  PowerShell
 
 # First, create a time check:
 END { print "This Perl program ran for ", time() - $^T, " seconds.  All changes reported.\n"}
@@ -35,7 +36,6 @@ chomp $resp; # Get rid of newline character at the end
 if ($resp ne "g") { print "Quit!  "; exit 0; } else { print "Working...\n"; }
 
 # Now do all the work:
-print "Okay, these are the original branches with their renamed leafs:\n";
 finddepth({ wanted => \&allds, no_chdir => 1 }, "."); # dots in dirs
 finddepth({ wanted => \&allds, no_chdir => 1 }, "."); # dots in lower dirs
 finddepth({ wanted => \&allfods, no_chdir => 1 }, ".");
@@ -74,8 +74,10 @@ sub allfods {
   $fodbn =~ s/é/e/g; # remove French stuff
   $fodbn =~ s/ê/e/g; # remove French stuff
   $fodbn =~ s/ï/i/g; # remove French stuff
+  $fodbn =~ s/．/_/g; # remove fullwidth full stop
   $fodbn =~ s/'/_/g; # remove French stuff
   $fodbn =~ s///g; # ZNc
+  # print "$fodbn\n"; # for debugging
   $ext =~ s/\.\s+/\./g;  # - take out any weirdly present blanks
   my $fod1 = $dir.$fodbn.$ext;
   if ($fod0 ne $fod1) {
