@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Joseph Harriott - https://harriott.github.io/ - ven 08 août 2025
+# Joseph Harriott - https://harriott.github.io/ - mar 03 mars 2026
 
 # This script looks recursively at all files and directories in the current directory,
 # and prints out the list found, but with these changes:
@@ -22,7 +22,9 @@
 
 # Caveat: this may silently fail to rename folders monitored by Dropbox.
 
-use strict;  use warnings;  use File::Basename;  use File::Copy 'move';
+use strict;  use warnings;
+use File::Basename; # fileparse(), fails on    on  Win10
+use File::Copy 'move';
 use File::Find; # finddepth()
 use utf8; # required for handling accented characters from  PowerShell
 
@@ -52,15 +54,16 @@ sub allds {
           $dnf = $dnf."_".$tc;  # - added a count if target exists
         }
         move $_, $dnf;
-        # print "$_\n$dnf\n"; # - reports the changes done
+        print "$_\n$dnf\n"; # - reports the changes done
       }
     }
   };
 } # change . to _ in directory names - repeat for deeper levels
 
 sub allfods {
-  my ($fodbn,$dir,$ext) = fileparse($_, qr/\.[^.]*/); # $_  defined by  File::Find
+  my ($fodbn,$dir,$ext) = fileparse($_, qr/\.[^.]*/); # $_  defined by  finddepth
   my $fod0 = $dir.$fodbn.$ext;
+  # print "$fod0\n"; # - for debugging, showing  $dir  fails on    on  Win10
   if (-f $_) {$ext = lc($ext)}; # lowercase
   $fodbn =~ s/\s+-/-/g; # strip out blanks before hyphens
   $fodbn =~ s/-\s+/-/g; # strip out blanks after hyphens
@@ -87,7 +90,7 @@ sub allfods {
       $fod1 = $dir.$fodbn."_".$tc.$ext;  # - added a count if target exists
     }
     move $fod0, $fod1;
-    # print "$fod1\n"; # - reports the changes done
+    print "$fod1\n"; # - reports the changes done
   }
 } # fix all file or directory names
 
