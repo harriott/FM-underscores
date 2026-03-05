@@ -1,6 +1,6 @@
 # vim: set fdl=5:
 
-# Joseph Harriott  mer 04 mars 2026
+# Joseph Harriott  jeu 05 mars 2026
 # $onGH/FM-underscores/treeTidy.ps1
 
 # (internally) lists all of the current directory structure, (internally) rearranges it, then, working from the leaves to the root, fixes issues in node names
@@ -21,19 +21,22 @@ foreach ($dir in $dirs) {
   $ndrl = $drl -replace '\.','_'
   $ndrl = $ndrl -replace '"','' # remove any double quotes
   $ndrl = $ndrl -replace "'",'_' # replace any single quotes
-  $ndrl = $ndrl -replace 'à','a'
-  $ndrl = $ndrl -replace 'é','e'
-  $ndrl = $ndrl -replace 'è','e'
-  $ndrl = $ndrl -replace 'ê','e'
-  $ndrl = $ndrl -replace 'ï','i'
-  $ndrl = $ndrl -replace 'î','i'
+  $ndrl = $ndrl -creplace 'À','A'
+  $ndrl = $ndrl -creplace 'à','a'
+  $ndrl = $ndrl -creplace 'ç','c'
+  $ndrl = $ndrl -creplace 'É','E'
+  $ndrl = $ndrl -creplace 'è|é|ê|ë','e'
+  $ndrl = $ndrl -creplace 'Ï','I'
+  $ndrl = $ndrl -creplace 'î|ï','i'
+  $ndrl = $ndrl -creplace 'œ','oe'
+  $ndrl = $ndrl -creplace 'ù','u'
   $ndrl = $ndrl -replace '',''
-  $ndrl = $ndrl -replace ' ','_'
-  $ndrl = $ndrl -replace '__','_'
+  $ndrl = $ndrl -replace ' | ','_' # space & no-break space
+  $ndrl = $ndrl -replace '–','-' # en dash
+  $ndrl = $ndrl -replace '_+','_'
   $ndrl = $ndrl -replace '_-_','-'
   if ($ndrl -ne $drl) {
     $ndrlno = "$drr/$ndrl" -replace '\./','' # $ndrl  name only
-    # mv "$drr/$drl" "$drr/$ndrl"; "$drr/$ndrl" -replace '\./',''
     mv "$drr/$drl" "$drr/$ndrl"
     write-color -text $drl,'->',$ndrlno -color DarkGreen,DarkYellow,White
   }
@@ -44,25 +47,29 @@ write-host '- all done'
 $files = ls -af -s * | select -expand FullName
 foreach ($file in $files) {
   $fr = $file.substring($wd.length+1) # file relative
-  $frf = $fr -replace ' ','_' # file relative fixed
+  $frf = $fr -replace ' | ','_' # file relative fixed for space & no-break space
+  $frf = $frf -replace "'|’",'_' # replace any single quotes
+  $frf = $frf -creplace 'À|à','A'
+  $frf = $frf -creplace 'à','a'
+  $frf = $frf -creplace 'ç','c'
+  $frf = $frf -creplace 'É','E'
+  $frf = $frf -creplace 'è|é|ê|ë','e'
+  $frf = $frf -creplace 'Ï','I'
+  $frf = $frf -creplace 'ï','i'
+  $frf = $frf -creplace 'œ','oe'
+  $frf = $frf -creplace 'ù','u'
+  $frf = $frf -replace '–|：','-' # en dash, fullwidth colon
   $frf = $frf -replace '_-_','-'
-  $frf = $frf -replace "'",'_' # replace any single quotes
-  $frf = $frf -replace "’",'_'
-  $frf = $frf -replace "à",'a'
-  $frf = $frf -replace "é",'e'
-  $frf = $frf -replace "è",'e'
-  $frf = $frf -replace "ê",'e'
-  $frf = $frf -replace "ï",'i'
-  $frf = $frf -replace "：",'-'
   if ( $frf -match '\[' ) {
     $fr = $fr -replace "\[",'`[' # backtick the [
     $frf = $frf -replace "\[",'_'
   }
   if ( $frf -match '\]' ) {
-    $fr = $fr -replace "]",'`]' # backtick the ]
-    $frf = $frf -replace "]",'_'
+    $fr = $fr -replace ']','`]' # backtick the ]
+    $frf = $frf -replace ']','_'
   }
-  $frf = $frf -replace "_+",'_'
+  $frf = $frf -replace '_+','_'
+  $frf = $frf -replace '\\_','\\'
   if ($frf -ne $fr) {
     if ( test-path $frf ) {
       $frf = ($frf -replace '\.([^.]*)$', '-') + (ls $frf | select -expand extension)
@@ -79,8 +86,6 @@ foreach ($file in $files) {
     $frff = $db + (ls $frf | select -expand extension)
     mv $frf $frff; $frff
   }
-  # Finally, get rid of any  .DS_Store
-  if ( $frf -match '\.DS_Store' ) { rm $frf }
 }
 write-host '- all done'
 
