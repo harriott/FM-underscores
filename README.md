@@ -1,8 +1,5 @@
-underscores
-===========
 
-A Perl script that works recursively through the directory it's in,
-renaming files and directories to be free of white spaces.
+    $onGH/FM-underscores/README.md
 
-Some edge cases are handled - see the comments inside the script.
+a few scripts to rid a directory tree of white spaces
 

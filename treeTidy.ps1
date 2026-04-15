@@ -1,9 +1,11 @@
 # vim: set fdl=5:
 
 # Joseph Harriott  jeu 05 mars 2026
-# $onGH/FM-underscores/treeTidy.ps1
+# & $onGH/FM-underscores/treeTidy.ps1
 
-# (internally) lists all of the current directory structure, (internally) rearranges it, then, working from the leaves to the root, fixes issues in node names
+# (internally) lists all of the current directory structure, (internally) rearranges it, then
+#  1) working from the leaves to the root, fixes issues in directory names
+#  2) fixes issues in file names
 
 # Write-Host 'About to recursively fix naming issues in the whole directory tree ' -NoNewline
 # [System.Console]::ForegroundColor = 'Yellow'
