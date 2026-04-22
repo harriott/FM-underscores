@@ -2,6 +2,12 @@
 
 # Joseph Harriott - https://harriott.github.io/ - mar 03 mars 2026
 
+# This was one of my first scripts, but is now useless:
+#  the unicode substitutions don't work on Linux
+#  fileparse fails on Win10
+
+# ----------------------------------------------------------------
+
 # This script looks recursively at all files and directories in the current directory,
 # and prints out the list found, but with these changes:
 # - File (not directory) extensions: lowercased, and any leading blankspaces removed
@@ -27,6 +33,7 @@ use File::Basename; # fileparse(), fails on    on  Win10
 use File::Copy 'move';
 use File::Find; # finddepth()
 use utf8; # required for handling accented characters from  PowerShell
+# use utf8::all; # makes a mess in Arch
 
 # First, create a time check:
 END { print "This Perl program ran for ", time() - $^T, " seconds.  All changes reported.\n"}
@@ -63,24 +70,25 @@ sub allds {
 sub allfods {
   my ($fodbn,$dir,$ext) = fileparse($_, qr/\.[^.]*/); # $_  defined by  finddepth
   my $fod0 = $dir.$fodbn.$ext;
-  # print "$fod0\n"; # - for debugging, showing  $dir  fails on    on  Win10
+  print "$fod0\n"; # - for debugging, showing  $dir  fails on    on  Win10
+  # print "$fodbn\n"; # - for debugging,
   if (-f $_) {$ext = lc($ext)}; # lowercase
-  $fodbn =~ s/\s+-/-/g; # strip out blanks before hyphens
-  $fodbn =~ s/-\s+/-/g; # strip out blanks after hyphens
-  $fodbn =~ s/\s+_/_/g; # strip out blanks before underscores
-  $fodbn =~ s/_\s+/_/g; # strip out blanks after underscores
-  $fodbn =~ s/\s+$//g; # strip off trailing blanks
-  $fodbn =~ s/\s+/_/g; # convert all inner blanks to underscores
-  $fodbn =~ s/à/a/g; # remove French stuff
-  $fodbn =~ s/è/e/g; # remove French stuff
-  $fodbn =~ s/É/E/g; # remove French stuff
+  # $fodbn =~ s/\s+-/-/g; # strip out blanks before hyphens
+  # $fodbn =~ s/-\s+/-/g; # strip out blanks after hyphens
+  # $fodbn =~ s/\s+_/_/g; # strip out blanks before underscores
+  # $fodbn =~ s/_\s+/_/g; # strip out blanks after underscores
+  # $fodbn =~ s/\s+$//g; # strip off trailing blanks
+  # $fodbn =~ s/\s+/_/g; # convert all inner blanks to underscores
+  # $fodbn =~ s/à/a/g; # remove French stuff
+  # $fodbn =~ s/è/e/g; # remove French stuff
+  # $fodbn =~ s/É/E/g; # remove French stuff
   $fodbn =~ s/é/e/g; # remove French stuff
-  $fodbn =~ s/ê/e/g; # remove French stuff
-  $fodbn =~ s/ï/i/g; # remove French stuff
-  $fodbn =~ s/．/_/g; # remove fullwidth full stop
-  $fodbn =~ s/'/_/g; # remove French stuff
-  $fodbn =~ s///g; # ZNc
-  # print "$fodbn\n"; # for debugging
+  # $fodbn =~ s/ê/e/g; # remove French stuff
+  # $fodbn =~ s/ï/i/g; # remove French stuff
+  # $fodbn =~ s/．/_/g; # remove fullwidth full stop
+  # $fodbn =~ s/'/_/g; # remove French stuff
+  # $fodbn =~ s///g; # ZNc
+  print "$fodbn\n"; # for debugging
   $ext =~ s/\.\s+/\./g;  # - take out any weirdly present blanks
   my $fod1 = $dir.$fodbn.$ext;
   if ($fod0 ne $fod1) {

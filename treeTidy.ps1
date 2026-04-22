@@ -7,11 +7,11 @@
 #  1) working from the leaves to the root, fixes issues in directory names
 #  2) fixes issues in file names
 
-# Write-Host 'About to recursively fix naming issues in the whole directory tree ' -NoNewline
-# [System.Console]::ForegroundColor = 'Yellow'
-# $reply = read-host '- are you in the right parent directory? '
-# [System.Console]::ResetColor()
-# if ($reply -ne 'y') { return }
+ Write-Host 'About to recursively fix naming issues in the whole directory tree ' -NoNewline
+ [System.Console]::ForegroundColor = 'Yellow'
+ $reply = read-host '- are you in the right parent directory? '
+ [System.Console]::ResetColor()
+ if ($reply -ne 'y') { return }
 
 $dirs = ls -ad -s * | select -expand FullName | sort { $_.Length } -Descending
 $wd = [string]$pwd
