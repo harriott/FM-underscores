@@ -12,17 +12,18 @@
 #  fd 'â|à|è|é|ê|ë|ï|'
 
 echo 'About to recursively fix naming issues in the whole directory tree'
-read -p " ${tpf5}- are you in the right parent directory?${tpfn} " go
+# read -p " ${tpf5}- are you in the right parent directory?${tpfn} " go
 
-mapfile -t fdH < <(fd . -H) # easier output than the  .  &  ./...  produced by  find .
+mapfile -t fdH < <(fd . -u) # easier output than the  .  &  ./...  produced by  find .
 mapfile -t -d $'\0' fdHs < <(for node in "${fdH[@]}";do printf '%s %s\0' "${#node}" "$node"; done | sort -z -k1,1rn -k2 | cut -zd " " -f2-) # - (stackexchange 482393) reverse sorted by length
 for node in "${fdHs[@]}"; do
     ne=$(echo $node | sed 's;/$;;') # nodes equal (= no trailing / for directories)
-    leaf="${ne##*/}" # get the leaf
-    la=$(echo $leaf | sed "s/^\./_/") # "leaf all" (= hidden revealed)
-    la=$(echo $la | sed 's/\.$/_/') # no trailing . (unlikely edge case)
-    le=''; [[ $la =~ \. ]] && le=${la##*.} # leaf extension
-    ln=${la%.*} # leaf name
+    # echo "$ne" # should list the nodes by decreasing length
+    leaf="${ne##*/}" # get the possibly messy leaf
+    lm=$(echo $leaf | sed "s/^\./※/") # "leaf marked" (= temporarily mark hidden files)
+    lm=$(echo $lm | sed 's/\.$/_/') # no trailing . (unlikely edge case)
+    le=''; [[ $lm =~ \. ]] && le=${lm##*.} # leaf extension
+    ln=${lm%.*} # leaf name
     ln="${ln//ç/c}"
     ln="${ln//œ/oe}"
     ln="${ln//ù/u}"
@@ -37,6 +38,7 @@ for node in "${fdHs[@]}"; do
     ln=$(echo $ln | sed 's/[[:space:]]*-[[:space:]]*/-/g')
     ln=$(echo $ln | sed 's/[[:space:]]*_[[:space:]]*/_/g') # ln='a _ b_ c  _d e'
     ln=$(echo $ln | sed 's/[[:space:]]\+/_/g') # ln='a  bc'
+    ln=$(echo $ln | sed "s/※/./") # reset hidden files
     [[ -n $le ]] && ln="$ln.$le"
     fullpath="${ne%/*}" # get the fullpath
     if [[ $leaf != $ln ]]; then
