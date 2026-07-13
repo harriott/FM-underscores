@@ -1,6 +1,6 @@
 # vim: set fdl=5:
 
-# Joseph Harriott  sam 11 juil 2026
+# Joseph Harriott  lun 13 juil 2026
 
 # bash $onGH/FM-underscores/treeTidy.sh
 
@@ -14,11 +14,19 @@
 echo 'About to recursively fix naming issues in the whole directory tree'
 # read -p " ${tpf5}- are you in the right parent directory?${tpfn} " go
 
-mapfile -t fdH < <(fd . -u) # easier output than the  .  &  ./...  produced by  find .
+mapfile -t fdH < <(fd . -I) # easier output than the  .  &  ./...  produced by  find .
 mapfile -t -d $'\0' fdHs < <(for node in "${fdH[@]}";do printf '%s %s\0' "${#node}" "$node"; done | sort -z -k1,1rn -k2 | cut -zd " " -f2-) # - (stackexchange 482393) reverse sorted by length
 for node in "${fdHs[@]}"; do
-    ne=$(echo $node | sed 's;/$;;') # nodes equal (= no trailing / for directories)
-    # echo "$ne" # should list the nodes by decreasing length
+    # echo "$node" # should list the nodes by decreasing length
+    ne=$node
+    if [[ $ne =~ /$ ]]; then
+        ne=$(echo $node | sed 's;/$;;') # "nodes equal" (= no trailing / for directories)
+    fi
+    if [[ $ne =~ / ]]; then
+        fullpath="${ne%/*}"
+    else
+        fullpath='.'  # it`s a directory, not a subdirectory
+    fi
     leaf="${ne##*/}" # get the possibly messy leaf
     lm=$(echo $leaf | sed "s/^\./※/") # "leaf marked" (= temporarily mark hidden files)
     lm=$(echo $lm | sed 's/\.$/_/') # no trailing . (unlikely edge case)
@@ -40,7 +48,6 @@ for node in "${fdHs[@]}"; do
     ln=$(echo $ln | sed 's/[[:space:]]\+/_/g') # ln='a  bc'
     ln=$(echo $ln | sed "s/※/./") # reset hidden files
     [[ -n $le ]] && ln="$ln.$le"
-    fullpath="${ne%/*}" # get the fullpath
     if [[ $leaf != $ln ]]; then
         echo "${tpf4}$fullpath${tpfn} $ln"
         mv "$node" "$fullpath/$ln"
